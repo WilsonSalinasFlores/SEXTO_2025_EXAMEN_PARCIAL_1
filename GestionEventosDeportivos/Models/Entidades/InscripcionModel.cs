@@ -1,13 +1,19 @@
-﻿namespace GestionEventosDeportivos.Models.Entidades
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace GestionEventosDeportivos.Models.Entidades
 {
-    // Models/InscripcionModel.cs
+    [Table("Inscripciones")]
     public class InscripcionModel
     {
+        [Key]
         public int InscripcionId { get; set; }
 
+        [ForeignKey("EventoModel")]
         public int EventoId { get; set; }
         public EventoModel Evento { get; set; }
 
+        [ForeignKey("ParticipanteModel")]
         public int ParticipanteId { get; set; }
         public ParticipanteModel Participante { get; set; }
 
