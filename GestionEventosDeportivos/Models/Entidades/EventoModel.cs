@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace GestionEventosDeportivos.Models.Entidades
@@ -12,6 +13,7 @@ namespace GestionEventosDeportivos.Models.Entidades
         public EventoModel()
         {
             Inscripciones = new HashSet<InscripcionModel>();
+            Eliminado = false;
         }
 
         [Key]
@@ -28,7 +30,9 @@ namespace GestionEventosDeportivos.Models.Entidades
         
         [Required]
         public string Descripcion { get; set; }
-        
+
+        [AllowNull]
+        public bool ? Eliminado { get; set; } = false;
         public ICollection<InscripcionModel> Inscripciones { get; set; }
     }
 

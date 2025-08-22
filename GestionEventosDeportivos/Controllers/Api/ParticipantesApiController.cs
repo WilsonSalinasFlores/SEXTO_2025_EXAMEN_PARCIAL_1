@@ -25,7 +25,7 @@ namespace GestionEventosDeportivos.Controllers.Api
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ParticipanteModel>>> GetParticipantes()
         {
-            return await _context.Participantes.ToListAsync();
+            return await _context.Participantes.Where(p => p.Eliminado==false).ToListAsync();
         }
 
         // GET: api/ParticipantesApi/5
@@ -48,7 +48,7 @@ namespace GestionEventosDeportivos.Controllers.Api
         {
             var participantes = await _context.Inscripciones
                 .Include(i => i.Participante)
-                .Where(i => i.EventoId == EventoId)
+                .Where(i => i.EventoId == EventoId && i.Participante.Eliminado==false)
                 .Select(i => new ParticipantePorEventoDto
                 {
                     InscripcionId = i.InscripcionId,

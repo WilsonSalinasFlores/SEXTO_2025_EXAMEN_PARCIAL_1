@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace GestionEventosDeportivos.Models.Entidades
 {
@@ -27,7 +28,12 @@ namespace GestionEventosDeportivos.Models.Entidades
 
         public string Telefono { get; set; }
 
+        [AllowNull] 
+        public bool? Eliminado { get; set; } = false;
+
         public ICollection<InscripcionModel> Inscripciones { get; set; }
+
+        
     }
 
 

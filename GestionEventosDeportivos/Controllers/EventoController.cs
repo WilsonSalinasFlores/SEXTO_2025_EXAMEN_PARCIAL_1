@@ -22,7 +22,8 @@ namespace GestionEventosDeportivos.Controllers
         // GET: Evento
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Eventos.ToListAsync());
+            var EventosActivos = await _context.Eventos.Where(e => e.Eliminado == false).ToListAsync();
+            return View(EventosActivos);
         }
 
         // GET: Evento/Details/5
@@ -142,7 +143,7 @@ namespace GestionEventosDeportivos.Controllers
             var eventoModel = await _context.Eventos.FindAsync(id);
             if (eventoModel != null)
             {
-                _context.Eventos.Remove(eventoModel);
+                eventoModel.Eliminado=true;
             }
 
             await _context.SaveChangesAsync();
