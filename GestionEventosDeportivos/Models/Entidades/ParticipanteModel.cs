@@ -4,9 +4,15 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace GestionEventosDeportivos.Models.Entidades
 {
 
-    [Table("Eventos")]
+    [Table("Paticipantes")]
     public class ParticipanteModel
+
     {
+        public ParticipanteModel()
+        {
+            Inscripciones = new HashSet<InscripcionModel>();
+        }
+
         [Key]
         public int ParticipanteId { get; set; }
 

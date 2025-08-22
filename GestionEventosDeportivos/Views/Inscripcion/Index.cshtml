@@ -1,0 +1,129 @@
+﻿@model IEnumerable<GestionEventosDeportivos.Models.Entidades.InscripcionModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="form-check form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+  <label class="form-check-label" for="flexSwitchCheckDefault">Mostrar Eventos Inactivos</label>
+    <script>
+        document.getElementById('flexSwitchCheckDefault').addEventListener('change', function() {
+            cargarListaEventos(this.checked);
+        });
+    </script>
+    </div>
+
+<div class="form-group w-80 mx-auto shadow p-4" id="inscripcionDiv">
+    <h2>Inscripciones</h2>
+
+
+    <div class="input-group mb-4">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for="listaEventos">Eventos</label>
+        </div>
+        <select class="custom-select" id="listaEventos" onchange="cargarListaParticipantes(this.value)">
+
+        </select>
+    </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class=" mb-3">
+                    <label class="control-label">Nombre del Evento</label>
+                    <input id="nombreEvento" class="form-control" />
+                    
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group mb-3">
+                    <label class="control-label">Fecha</label>
+                    <input id="fechaEvento" class="form-control readonly" readonly />
+                </div>
+            </div>
+    </div>
+    <div class="row">
+            <div class="form-group mb-3">
+                <label class="control-label">Ubicación</label>
+                <input id="ubicacionEvento" class="form-control readonly" readonly />
+            </div>
+            <div class="form-group mb-3">
+                <label class="control-label">Descripción del Evento</label>
+                <input id="descripcionEvento" class="form-control readonly" readonly />
+
+            </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoParticipanteModal" onclick="nuevoParticipante()">Inscribir Participante</button>
+        </div>
+    </div>
+<p></p>
+    <div class="input-group mb-4">
+        <table class="table table-striped table-bordered table-responsive">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaTablaParticipantes">
+                <tr>
+                    <td>Juan Pérez</td>
+                    <td>juan.perez@example.com</td>
+                    <td>123456789</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarParticipante(1)">Eliminar</button>
+                        <button class="btn btn-warning btn-sm" onclick="editarParticipante(1)">Editar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade" id="nuevoParticipanteModal" tabindex="-1" role="dialog" aria-labelledby="Nuevo Participante" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Nuevo Participante</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="listaParticipantesModal">Participantes</label>
+                    </div>
+                    <select class="custom-select" id="listaParticipantesModal" onchange="cargarParticipantesModal(this.value)">
+                        <option value="">Seleccione un Participante</option>
+                    </select>
+                </div>
+                <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="nuevoParticipanteEmail">Email</label>
+                    </div>
+                    <input type="email" class="form-control" id="nuevoParticipanteEmail" />
+                </div>
+                <div class="input-group mb-4">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="nuevoParticipanteTelefono">Teléfono</label>
+                    </div>
+                    <input type="text" class="form-control" id="nuevoParticipanteTelefono" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="guardarInscripcion()">Inscribir</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            cargarListaEventos(false);
+        });
+    </script>
+}

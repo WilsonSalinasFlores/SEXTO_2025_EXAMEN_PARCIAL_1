@@ -1,9 +1,11 @@
 using GestionEventosDeportivos.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Agregar servicio de configuración de la base de datos
 var cn = builder.Configuration.GetConnectionString("cn")
     ?? throw new InvalidOperationException("No existe la referencia a la conexion");
-
 builder.Services.AddDbContext<DatosDbContext>(opciones => opciones.UseSqlServer(cn));
 
 // Add services to the container.

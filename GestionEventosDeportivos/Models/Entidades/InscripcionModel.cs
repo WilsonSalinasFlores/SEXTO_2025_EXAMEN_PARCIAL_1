@@ -7,6 +7,7 @@ namespace GestionEventosDeportivos.Models.Entidades
     public class InscripcionModel
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int InscripcionId { get; set; }
 
         [ForeignKey("EventoModel")]
