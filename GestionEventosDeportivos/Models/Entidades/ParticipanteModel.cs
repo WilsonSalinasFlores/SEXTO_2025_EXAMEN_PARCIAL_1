@@ -31,4 +31,16 @@ namespace GestionEventosDeportivos.Models.Entidades
     }
 
 
+public class ParticipantePorEventoDto
+{
+    public int InscripcionId { get; set; }
+    public int ParticipanteId { get; set; }
+    public string Nombre { get; set; }
+    public string Apellido { get; set; }
+    public string Email { get; set; }
+    public DateTime FechaInscripcion { get; set; }
+
+    public string Telefono { get; set; }
+}
+
 }

@@ -23,10 +23,8 @@ var cargarListaEventos = async (todos) => {
     }
     const select = document.getElementById('listaEventos');
     const optionSelecionar = document.createElement('option');
-    optionSelecionar.textContent = 'Seleccione un Evento';
-    optionSelecionar.value = '-1';
-    optionSelecionar.disabled = true;
-    optionSelecionar.selected = true;
+    
+    
     select.appendChild(optionSelecionar);
 
     eventos.forEach(evento => {
@@ -35,6 +33,29 @@ var cargarListaEventos = async (todos) => {
         option.textContent = evento.nombre;
         select.appendChild(option);
     });
+
+    
+    optionSelecionar.textContent = 'Seleccione un Evento';
+    optionSelecionar.value = '-1';
+    optionSelecionar.disabled = true;
+    optionSelecionar.selected = true;
+    select.value = '-1';
+    const eventoGuardado = localStorage.getItem("evento");
+    if (eventoGuardado) {
+        const estado = JSON.parse(eventoGuardado);
+        select.value = estado.filtro;
+        var sw=0
+        eventos.forEach(evento => {
+            if (evento.eventoId == estado.filtro) {
+                cargarListaParticipantes(estado.filtro);
+                sw=1;
+            }
+        });
+        if (sw==0){
+            select.value = '-1';
+        }
+    }
+
     
 };
 var cargarListaParticipantes = async (eventoId) => {
@@ -49,18 +70,32 @@ var cargarListaParticipantes = async (eventoId) => {
         document.getElementById('descripcionEvento').value = evento.descripcion;
     }
 
-    const responseParticipantes = await fetch(`/api/ParticipantesApi/${eventoId}`);
+    const estado = {
+        filtro: document.getElementById("listaEventos").value,
+        pagina: window.location.pathname
+    };
+
+    localStorage.setItem("evento", JSON.stringify(estado));
+    const responseParticipantes = await fetch(`/api/ParticipantesApi/ParticipantesPorEvento/${eventoId}`);
     const participantes = await responseParticipantes.json();
 
-    const tbody = document.getElementById('listaParticipantes');
+    const tbody = document.getElementById('listaTablaParticipantes');
     tbody.innerHTML = '';
 
     participantes.forEach(participante => {
         const tr = document.createElement('tr');
+        tr.setAttribute('id', participante.inscripcionId);
+        tr.setAttribute('id-participante', participante.participanteId);
+        
+        const fecha = participante.fechaInscripcion ? participante.fechaInscripcion.split('T')[0] : '';
         tr.innerHTML = `
-            <td>${participante.nombre}</td>
-            <td>${participante.email}</td>
-            <td>${participante.telefono}</td>
+            <td>${participante.nombre.trim()} ${participante.apellido.trim()}</td>
+            <td>${participante.email.trim()}</td>
+            <td>${participante.telefono.trim()}</td>
+            <td>${fecha}</td>
+            <td>
+            <button class="btn btn-danger" onclick="eliminarInscripcion(${participante.inscripcionId})">Eliminar</button>
+            </td>
         `;
         tbody.appendChild(tr);
     });
@@ -112,26 +147,66 @@ var guardarInscripcion = async () => {
     const eventoId = document.getElementById('listaEventos').value;
     const participanteId = document.getElementById('listaParticipantesModal').value;
 
-    if (!eventoId || !participanteId) {
+    if (!eventoId || !participanteId || eventoId === '-1' || participanteId === '-1') {
         alert('Por favor, seleccione un participante.');
         return;
     }
+    //Validar que no se haya insertado un participante
+    const responseValidar = await fetch(`/api/InscripcionesApi/ValidarParticipante/${eventoId}/${participanteId}`);
+    const existeInscripcion = await responseValidar.json();
 
-    const response = await fetch('/api/InscripcionesApi', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            eventoId: eventoId,
-            participanteId: participanteId
-        })
-    });
+    if (existeInscripcion) {
+        alert('El participante ya está inscrito en este evento.');
+        return;
+    }
 
-    if (response.ok) {
-        alert('Inscripción guardada exitosamente.');
-        location.reload();
-    } else {
-        alert('Error al guardar la inscripción.');
+    var inscripcion={
+        inscripcionId: 0,
+        eventoId: eventoId,
+        participanteId: participanteId,
+        fechaInscripcion: new Date().toISOString()
+    }
+
+    try {
+        
+        const response = await fetch('/api/InscripcionesApi', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(inscripcion)
+        });
+
+        if (response.ok) {
+            alert('Inscripción guardada exitosamente.');
+            var modal = bootstrap.Modal.getInstance(document.getElementById('nuevoParticipanteModal'));
+            modal.hide();
+            location.reload();
+        } else {
+           alert(`Error al guardar la inscripción. ${response.statusText}`);
+        }
+    } catch (error ) {
+        console.error('Error al guardar la inscripción:', error);
+    }
+};
+
+var eliminarInscripcion = async (inscripcionId) => {
+    if (confirm('¿Estás seguro de que deseas eliminar esta inscripción?')) {
+        try {
+            const response = await fetch(`/api/InscripcionesApi/${inscripcionId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                
+                const eventoId = document.getElementById('listaEventos').value;
+                location.reload();
+                document.getElementById('listaEventos').value = eventoId;
+            } else {
+                alert(`Error al eliminar la inscripción. ${response.statusText}`);
+            }
+        } catch (error) {
+            console.error('Error al eliminar la inscripción:', error);
+        }
     }
 };

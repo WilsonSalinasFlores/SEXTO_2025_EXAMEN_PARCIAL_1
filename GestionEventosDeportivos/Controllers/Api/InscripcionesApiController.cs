@@ -42,47 +42,34 @@ namespace GestionEventosDeportivos.Controllers.Api
             return inscripcionModel;
         }
 
-        // PUT: api/InscripcionesApi/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutInscripcionModel(int id, InscripcionModel inscripcionModel)
+        [HttpGet("ValidarParticipante/{eventoId}/{participanteId}")]
+        public async Task<ActionResult<bool>> ValidarParticipante(int eventoId, int participanteId)
         {
-            if (id != inscripcionModel.InscripcionId)
-            {
-                return BadRequest();
-            }
+            bool existe = await _context.Inscripciones
+                .AnyAsync(i => i.EventoId == eventoId && i.ParticipanteId == participanteId);
 
-            _context.Entry(inscripcionModel).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!InscripcionModelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            return Ok(existe);
         }
+
 
         // POST: api/InscripcionesApi
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<InscripcionModel>> PostInscripcionModel(InscripcionModel inscripcionModel)
+        public async Task<ActionResult<InscripcionModel>> PostInscripcionModel(InscripcionDto dto)
         {
-            _context.Inscripciones.Add(inscripcionModel);
+            var inscripcion = new InscripcionModel
+            {
+                EventoId = dto.EventoId,
+                ParticipanteId = dto.ParticipanteId,
+                FechaInscripcion = DateTime.Now
+            };
+
+            _context.Inscripciones.Add(inscripcion);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetInscripcionModel", new { id = inscripcionModel.InscripcionId }, inscripcionModel);
+            return CreatedAtAction("GetInscripcionModel", new { id = inscripcion.InscripcionId }, inscripcion);
         }
+
 
         // DELETE: api/InscripcionesApi/5
         [HttpDelete("{id}")]

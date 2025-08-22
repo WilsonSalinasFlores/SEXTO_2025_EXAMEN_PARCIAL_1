@@ -42,6 +42,35 @@ namespace GestionEventosDeportivos.Controllers.Api
             return participanteModel;
         }
 
+        // GET: api/ParticipantesApi/Evento/5
+        [HttpGet("ParticipantesPorEvento/{EventoId}")]
+        public async Task<ActionResult<List<ParticipantePorEventoDto>>> GetParticipanteByEventModel(int EventoId)
+        {
+            var participantes = await _context.Inscripciones
+                .Include(i => i.Participante)
+                .Where(i => i.EventoId == EventoId)
+                .Select(i => new ParticipantePorEventoDto
+                {
+                    InscripcionId = i.InscripcionId,
+                    ParticipanteId = i.ParticipanteId,
+                    Nombre = i.Participante.Nombre,
+                    Apellido = i.Participante.Apellido,
+                    Email = i.Participante.Email,
+                    Telefono = i.Participante.Telefono,
+                    FechaInscripcion = i.FechaInscripcion
+                })
+                .ToListAsync();
+
+            if (participantes == null || participantes.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return participantes;
+        }
+
+
+
         // PUT: api/ParticipantesApi/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
